@@ -1,5 +1,6 @@
-TouchManager 1.00 
+TouchManager 1.0.0 
 2013/11/26
+@takashicompany : http://takashicompany.com/
 
 現在のフレームの画面タッチ情報を基に、画面のタッチイベントを発行するクラス。
 シングルトンクラスとなっており、GameObjectにアタッチすることで動作する。

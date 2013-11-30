@@ -1,5 +1,5 @@
-// @takashicompany
-// TouchManager ver1.00 2013/11/26
+// @takashicompany : http://takashicompany.com/
+// TouchManager ver1.0.0 2013/11/26
 
 using UnityEngine;
 using System.Collections;
