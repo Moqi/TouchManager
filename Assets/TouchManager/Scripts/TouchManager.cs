@@ -1,4 +1,5 @@
 // @takashicompany
+// TouchManager ver1.00 2013/11/26
 
 using UnityEngine;
 using System.Collections;
@@ -36,7 +37,7 @@ public class TouchManager : MonoBehaviour {
 
 	public delegate void TouchPressDelegate(Vector2 position, float pressTime);
 	/// <summary>
-	/// 画面をタッチ続けた時に呼ばれるイベント。
+	/// 画面をタッチし続けた時に呼ばれるイベント。
 	/// </summary>
 	public static event TouchPressDelegate OnPress;
 

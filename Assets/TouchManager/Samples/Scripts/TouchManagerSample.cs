@@ -1,3 +1,6 @@
+// @takashicompany
+// TouchManager ver1.00 2013/11/26
+
 using UnityEngine;
 using System.Collections;
 
