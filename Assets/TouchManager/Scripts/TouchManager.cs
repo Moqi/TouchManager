@@ -13,14 +13,18 @@ internal enum MouseButtonEventType{
 	UP		// Input.GetMouseButtonUp
 }
 
-internal enum TouchEventType{
+public enum TouchEventType{
 	NONE,
 	TOUCH,
 	PRESS,
-	TAP,
 	SWIPE,
-	END
+	TOUCH_END,
+	LONG_PRESS,
+	TAP,
+	LONG_TAP,
+	SWIPE_END
 }
+
 
 /// <summary>
 /// デバイスのタッチ入力を管理するクラス。
@@ -241,7 +245,7 @@ public class TouchManager : MonoBehaviour {
 		}else if(touch.phase == TouchPhase.Moved){
 			return TouchEventType.SWIPE;
 		}else if(touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled){
-			return TouchEventType.END;
+			return TouchEventType.TOUCH_END;
 		}
 		return TouchEventType.NONE;
 	}
@@ -277,7 +281,7 @@ public class TouchManager : MonoBehaviour {
 			if(OnSwipe != null) OnSwipe(touchEvent.touch.position,touchList[0].position,touchTime);
 			break;
 
-			case TouchEventType.END:
+			case TouchEventType.TOUCH_END:
 
 			int moveIndex = touchList.FindIndex(m => m.phase == TouchPhase.Moved);
 
