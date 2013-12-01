@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 public class TouchEventHandler : MonoBehaviour {
 
+	public delegate void TouchDelegate(GameObject obj);
+	public event TouchDelegate OnTouch;
+
 	public Camera touchCamera;
 
 	private Dictionary<GameObject,TouchEventType> _currentEvent;
@@ -77,7 +80,17 @@ public class TouchEventHandler : MonoBehaviour {
 	}
 
 	private void ProcessTouchEvent (TouchEventType type, GameObject obj){
-		// TODO
+		if(obj == null) return;
+
+		if(_currentEvent.ContainsKey(obj)){
+			// TODO すでに現在のフレームで別のタッチポイントがオブジェクトを指定した時の処理を書く。
+		}else{
+			if(_currentEvent == null){
+				_currentEvent = new Dictionary<GameObject, TouchEventType>();
+			}
+			_currentEvent.Add(obj,type);
+		}
+
 	}
 
 	private GameObject GetRayCastHit (Vector2 position){
