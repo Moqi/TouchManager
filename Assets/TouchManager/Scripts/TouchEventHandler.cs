@@ -18,11 +18,14 @@ public class TouchEventHandler : MonoBehaviour {
 	public delegate void TouchDelegate(GameObject obj);
 	public event TouchDelegate OnTouch;
 
-	public delegate void SwipeDelegate(GameObject obj, Vector3 contactPosition);
+	public delegate void SwipeEnterDelegate(GameObject obj, Vector3 touchWorldPosition);
+	public event SwipeEnterDelegate OnSwipeEnter;
 
-	public event SwipeDelegate OnSwipeEnter;
-	public event SwipeDelegate OnSwipeStay;
-	public event SwipeDelegate OnSwipeExit;
+	public delegate void SwipeStayDelegate(GameObject obj, Vector3 touchWorldPosition);
+	public event SwipeStayDelegate OnSwipeStay;
+
+	public delegate void SwipeExitDelegate(GameObject obj);
+	public event SwipeExitDelegate OnSwipeExit;
 
 	public event TouchDelegate OnLongPress;
 
@@ -99,9 +102,9 @@ public class TouchEventHandler : MonoBehaviour {
 		ProcessTouchEvent(TouchEventType.SWIPE_END,GetRaycastHit(position));
 	}
 
-	private void ProcessTouchEvent (TouchEventType touchEventType, GameObject obj){
-		if(obj == null) return;
-
+	private void ProcessTouchEvent (TouchEventType touchEventType, TouchedObject touchedObject){
+		if(touchedObject == null) return;
+		GameObject obj = touchedObject.gameObject;
 		TouchEventHandlerType prevHandlerEventType = TouchEventHandlerType.NONE;
 
 		if(_prevEventDict != null && _prevEventDict.ContainsKey(obj)){
@@ -125,10 +128,10 @@ public class TouchEventHandler : MonoBehaviour {
 		case TouchEventType.SWIPE:{
 			if(prevHandlerEventType == TouchEventHandlerType.SWIPE_ENTER || prevHandlerEventType == TouchEventHandlerType.SWIPE_STAY){
 				_currentEventDict[obj] = TouchEventHandlerType.SWIPE_STAY;
-				if(OnSwipeStay != null) OnSwipeStay(obj);
+				if(OnSwipeStay != null) OnSwipeStay(obj,touchedObject.raycastHitPosition);
 			}else{
 				_currentEventDict[obj] = TouchEventHandlerType.SWIPE_ENTER;
-				if(OnSwipeEnter != null) OnSwipeEnter(obj);
+				if(OnSwipeEnter != null) OnSwipeEnter(obj,touchedObject.raycastHitPosition);
 			}
 		}break;
 
@@ -159,44 +162,51 @@ public class TouchEventHandler : MonoBehaviour {
 		}
 	}
 
-	private GameObject GetRaycastHit (Vector2 position){
+	private TouchedObject GetRaycastHit (Vector2 position){
 
 		Ray ray = touchCamera.ScreenPointToRay(position);
 		RaycastHit hit;
-		//RaycastHit2D hit2D;
-		Collider2D collider2D;
-		GameObject obj3D = null;
-		GameObject obj2D = null;
-
+		Collider2D hitCollider2D;
+	
+		TouchedObject hit3D = null;
+		TouchedObject hit2D = null;
+	
 		// 3D
 		if(Physics.Raycast(ray,out hit)){
-			obj3D= hit.collider.gameObject;
+			hit3D = new TouchedObject(hit.collider.gameObject,hit.point);
 		}
 
 		// 2D
-		collider2D = Physics2D.OverlapPoint((Vector2)touchCamera.ScreenToWorldPoint(position));
-		if(collider2D != null){
-			obj2D = collider2D.gameObject;
+		Vector3 touchWorldPos = touchCamera.ScreenToWorldPoint(position);
+		hitCollider2D = Physics2D.OverlapPoint((Vector2)touchWorldPos);
+		if(hitCollider2D != null){
+			Vector3 hitPos = new Vector3(touchWorldPos.x,touchWorldPos.y,hitCollider2D.gameObject.transform.position.z);
+			hit2D = new TouchedObject(hitCollider2D.gameObject,hitPos);
 		}
-		/* なんでかよくわからないけど、null pointer が返ってくるのでコメントアウト : Physics2D.OverlapPointを使う実装に変更
-		hit2D = Physics2D.Raycast(ray.origin,ray.direction);
-		if(hit2D != null){
-			obj2D = hit2D.collider.gameObject;
-		}
-		*/
 
-		if(obj3D != null && obj2D != null){
-			float distance3D = Vector3.Distance(touchCamera.transform.position,obj3D.transform.position);
-			float distance2D = Vector2.Distance(touchCamera.transform.position,obj2D.transform.position);
-			return distance2D < distance3D ? obj3D : obj2D;
-		}else if(obj3D != null && obj2D == null){
-			return obj3D;
-		}else if(obj3D == null && obj2D != null){
-			return obj2D;
+		if(hit3D != null && hit2D != null){
+			float distance3D = Vector3.Distance(touchCamera.transform.position,hit3D.gameObject.transform.position);
+			float distance2D = Vector2.Distance(touchCamera.transform.position,hit2D.gameObject.transform.position);
+			return distance2D < distance3D ? hit2D : hit3D;
+		}else if(hit3D != null && hit2D == null){
+			return hit3D;
+		}else if(hit3D == null && hit2D != null){
+			return hit2D;
 		}
 		return null;
 	}
+
+	private class TouchedObject{
+		public GameObject gameObject{get; private set;}
+		public Vector3 raycastHitPosition{get; private set;}
+		public TouchedObject(GameObject gameObject,Vector3 raycastHitPosition){
+			this.gameObject = gameObject;
+			this.raycastHitPosition = raycastHitPosition;
+		}
+	}
 }
+
+
 
 internal class TouchEventObject {
 

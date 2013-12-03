@@ -30,12 +30,14 @@ public class TouchEventHandlerSample : MonoBehaviour {
 		Debug.Log("Touch:" + obj.name);
 	}
 
-	private void SwipeEnter(GameObject obj){
-		Debug.Log("SwipeEnter:" + obj.name);
+	private void SwipeEnter(GameObject obj, Vector3 position){
+		Debug.Log("SwipeEnter:" + obj.name + " position:" + position);
+		obj.transform.position = new Vector3(position.x,position.y,obj.transform.position.z);
 	}
 
-	private void SwipeStay(GameObject obj){
-		Debug.Log("SwipeStay:" + obj.name);
+	private void SwipeStay(GameObject obj, Vector3 position){
+		Debug.Log("SwipeStay:" + obj.name + " position:" + position);
+		obj.transform.position = new Vector3(position.x,position.y,obj.transform.position.z);
 	}
 
 	private void SwipeExit(GameObject obj){
